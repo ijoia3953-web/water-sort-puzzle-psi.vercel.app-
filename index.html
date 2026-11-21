@@ -1,0 +1,2066 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Water Sort Puzzle</title>
+    <meta name="description" content="Sort mixed colored liquids inside glasses until every glass holds a single solid color. Relaxing, challenging, and mobile-ready puzzle gameplay." />
+    <meta property="og:title" content="Water Sort Puzzle" />
+    <meta property="og:description" content="Sort mixed colored liquids inside glasses until every glass holds a single solid color." />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- GameMonetize.com HTML5 SDK -->
+    <script type="text/javascript">
+      window.SDK_OPTIONS = {
+        gameId: "your_game_id_here", // Fill the game_id
+        onEvent: function (a) {
+          switch (a.name) {
+            case "SDK_GAME_PAUSE":
+              window.dispatchEvent(new CustomEvent("gm:pause"));
+              break;
+            case "SDK_GAME_START":
+              window.dispatchEvent(new CustomEvent("gm:resume"));
+              break;
+            case "SDK_READY":
+              window.dispatchEvent(new CustomEvent("gm:ready"));
+              break;
+            case "SDK_ERROR":
+              window.dispatchEvent(new CustomEvent("gm:error"));
+              break;
+          }
+        }
+      };
+      (function (a, b, c) {
+        var d = a.getElementsByTagName(b)[0];
+        a.getElementById(c) || (a = a.createElement(b), a.id = c,
+        a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d));
+      })(document, "script", "gamemonetize-sdk");
+    </script>
+
+    <style>
+      :root {
+        --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+        --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      html, body, #app {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: var(--font-sans);
+        color: #f8fafc;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      body {
+        background-color: #090d1f;
+        background-image:
+          radial-gradient(ellipse 85% 70% at 18% 14%, rgba(67, 56, 202, 0.44) 0%, transparent 62%),
+          radial-gradient(ellipse 75% 65% at 86% 24%, rgba(109, 40, 217, 0.36) 0%, transparent 60%),
+          radial-gradient(circle at 50% 55%, #172554 0%, #1e1b4b 48%, #090d1f 100%);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+      }
+
+      /* Full-screen fixed soft-light atmospheric layer */
+      .ambient-softlight-layer {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+        mix-blend-mode: soft-light;
+      }
+
+      .soft-orb {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(64px);
+      }
+
+      .soft-orb-1 {
+        top: -128px;
+        left: -96px;
+        width: 520px;
+        height: 520px;
+        background: rgba(125, 211, 252, 0.4);
+      }
+
+      .soft-orb-2 {
+        top: 25%;
+        right: -112px;
+        width: 540px;
+        height: 540px;
+        background: rgba(192, 132, 252, 0.45);
+      }
+
+      .soft-orb-3 {
+        bottom: -144px;
+        left: 33%;
+        width: 640px;
+        height: 460px;
+        background: rgba(165, 180, 252, 0.35);
+      }
+
+      /* Studio ambient glows & floating bubbles */
+      .studio-backdrop {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .studio-glow-1 {
+        position: absolute;
+        top: -110px;
+        left: -96px;
+        width: 460px;
+        height: 460px;
+        border-radius: 9999px;
+        filter: blur(64px);
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.20) 0%, rgba(14, 165, 233, 0.06) 52%, transparent 75%);
+        animation: ambient-pulse 14s ease-in-out infinite;
+      }
+
+      .studio-glow-2 {
+        position: absolute;
+        top: 18%;
+        right: -96px;
+        width: 440px;
+        height: 440px;
+        border-radius: 9999px;
+        filter: blur(64px);
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.16) 0%, rgba(79, 70, 229, 0.05) 55%, transparent 78%);
+        animation: ambient-pulse 14s ease-in-out infinite;
+        animation-delay: -6s;
+      }
+
+      .studio-glow-3 {
+        position: absolute;
+        bottom: -120px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 720px;
+        height: 380px;
+        border-radius: 9999px;
+        filter: blur(64px);
+        background: radial-gradient(ellipse, rgba(20, 184, 166, 0.14) 0%, rgba(14, 116, 144, 0.04) 55%, transparent 78%);
+      }
+
+      .studio-spotlight {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 68% 54% at 50% 48%, rgba(224, 242, 254, 0.055) 0%, transparent 72%);
+      }
+
+      .studio-vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, transparent 58%, rgba(4, 9, 20, 0.48) 100%);
+      }
+
+      .particle-bubble {
+        position: absolute;
+        border-radius: 9999px;
+        animation: bubble-rise var(--bubble-duration, 16s) ease-in-out infinite;
+      }
+
+      /* App Shell */
+      #app {
+        position: relative;
+        z-index: 10;
+      }
+
+      .screen {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .screen-title {
+        align-items: center;
+        padding: 28px 24px;
+      }
+
+      /* Buttons & HUD */
+      .icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: 1px solid #1e293b;
+        background: rgba(15, 23, 42, 0.72);
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: border-color 150ms, color 150ms, background-color 150ms;
+      }
+
+      .icon-btn:hover {
+        border-color: #334155;
+        color: #ffffff;
+      }
+
+      .icon-btn.active {
+        border-color: rgba(16, 185, 129, 0.5);
+        background: rgba(16, 185, 129, 0.15);
+        color: #6ee7b7;
+      }
+
+      .icon-btn:focus-visible,
+      .btn-primary:focus-visible,
+      .btn-secondary:focus-visible,
+      .tube-btn:focus-visible,
+      .level-cell:focus-visible {
+        outline: 2px solid #38bdf8;
+        outline-offset: 2px;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        height: 48px;
+        padding: 0 32px;
+        border: none;
+        border-radius: 12px;
+        background: #0ea5e9;
+        color: #020617;
+        font-family: var(--font-sans);
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
+        transition: background-color 150ms, transform 150ms;
+        white-space: nowrap;
+      }
+
+      .btn-primary:hover {
+        background: #38bdf8;
+      }
+
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 48px;
+        padding: 0 20px;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        font-family: var(--font-sans);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 150ms, border-color 150ms, color 150ms;
+        white-space: nowrap;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: #1e293b;
+        border-color: #475569;
+        color: #ffffff;
+      }
+
+      .btn-secondary:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      /* Title Hero */
+      .title-top {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 896px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .title-main {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 720px;
+        width: 100%;
+        margin: auto 0;
+      }
+
+      .title-desc {
+        max-width: 420px;
+        margin: 0 0 26px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #cbd5e1;
+      }
+
+      .title-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .title-progress {
+        margin-top: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #94a3b8;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .title-footer {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        font-size: 12px;
+        color: #94a3b8;
+        letter-spacing: 0.02em;
+      }
+
+      /* Gameplay HUD & Playfield */
+      .game-header {
+        position: relative;
+        z-index: 20;
+        width: 100%;
+        max-width: 896px;
+        margin: 0 auto;
+        padding: 14px 18px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        pointer-events: none;
+      }
+
+      .game-header > * {
+        pointer-events: auto;
+      }
+
+      .hud-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #94a3b8;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .hud-title {
+        margin: 2px 0 0;
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+      }
+
+      .hud-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .playfield {
+        position: relative;
+        z-index: 10;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+      }
+
+      .tutorial-hint {
+        margin: 0 0 22px;
+        max-width: 440px;
+        padding: 0 16px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(186, 230, 253, 0.95);
+      }
+
+      .board-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        width: 100%;
+        max-width: 896px;
+      }
+
+      .tube-row-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tube-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 14px;
+        padding: 0 8px;
+      }
+
+      @media (min-width: 640px) {
+        .tube-row {
+          gap: 22px;
+        }
+        .hud-title {
+          font-size: 22px;
+        }
+      }
+
+      /* Smoked Glass Studio Shelf */
+      .tube-shelf {
+        pointer-events: none;
+        position: relative;
+        margin: 12px auto 0;
+        width: calc(100% + 44px);
+        max-width: 92vw;
+      }
+
+      .tube-shelf.compact {
+        margin-top: 10px;
+        width: calc(100% + 32px);
+      }
+
+      .shelf-edge {
+        height: 2px;
+        width: 100%;
+        border-radius: 9999px 9999px 0 0;
+        background: linear-gradient(90deg, transparent 0%, rgba(148, 163, 184, 0.22) 10%, rgba(224, 242, 254, 0.45) 50%, rgba(148, 163, 184, 0.22) 90%, transparent 100%);
+      }
+
+      .shelf-body {
+        height: 13px;
+        width: 100%;
+        border-radius: 0 0 12px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(180deg, rgba(30, 54, 86, 0.72) 0%, rgba(15, 30, 52, 0.88) 55%, rgba(8, 17, 33, 0.92) 100%);
+        box-shadow: 0 10px 24px -4px rgba(2, 6, 18, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      }
+
+      .shelf-glow {
+        margin: 0 auto;
+        height: 8px;
+        width: 80%;
+        border-radius: 9999px;
+        filter: blur(12px);
+        background: rgba(56, 189, 248, 0.14);
+      }
+
+      /* Tube sizing */
+      .tube-slot {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tube-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        border-radius: 16px;
+        background: transparent;
+        cursor: pointer;
+        transform-origin: 50% 65%;
+        transition: transform 200ms ease-out;
+      }
+
+      .tube-lg { width: 76px; height: 196px; }
+      .tube-md { width: 64px; height: 168px; }
+      .tube-sm { width: 54px; height: 142px; }
+
+      @media (min-width: 640px) {
+        .tube-lg { width: 86px; height: 222px; }
+        .tube-md { width: 76px; height: 196px; }
+        .tube-sm { width: 66px; height: 172px; }
+      }
+
+      .tube-floor-glow {
+        pointer-events: none;
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 48px;
+        height: 12px;
+        border-radius: 9999px;
+        filter: blur(10px);
+        transition: opacity 200ms;
+      }
+
+      .solved-badge {
+        pointer-events: none;
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 9999px;
+        background: #10b981;
+        color: #020617;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      .tutorial-pill {
+        pointer-events: none;
+        position: absolute;
+        top: -36px;
+        z-index: 25;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: tutorial-bob 1.3s ease-in-out infinite;
+      }
+
+      .tutorial-pill span {
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #020617;
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      }
+
+      .deadlock-banner {
+        margin-top: 18px;
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        background: rgba(245, 158, 11, 0.1);
+        color: #fde68a;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .action-bar {
+        position: relative;
+        z-index: 20;
+        width: 100%;
+        max-width: 448px;
+        margin: 0 auto;
+        padding: 8px 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .action-btn {
+        flex: 1;
+        height: 48px;
+        padding: 0 12px;
+        font-size: 14px;
+      }
+
+      .mono-count {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: #94a3b8;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Modals */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(2, 6, 23, 0.8);
+      }
+
+      .modal-card {
+        width: 100%;
+        max-width: 480px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        border-radius: 18px;
+        border: 1px solid #1e293b;
+        background: #0f172a;
+        padding: 24px;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65);
+      }
+
+      .modal-card-sm {
+        max-width: 390px;
+        text-align: center;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #1e293b;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .level-scroll {
+        margin-top: 16px;
+        overflow-y: auto;
+        padding-right: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .chapter-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .chapter-head h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #e2e8f0;
+      }
+
+      .chapter-head span {
+        font-size: 12px;
+        color: #94a3b8;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .level-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+      }
+
+      .level-cell {
+        position: relative;
+        height: 46px;
+        border-radius: 12px;
+        border: 1px solid #334155;
+        background: rgba(30, 41, 59, 0.8);
+        color: #f1f5f9;
+        font-family: var(--font-sans);
+        font-size: 14px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .level-cell.current {
+        border-color: #38bdf8;
+        background: rgba(14, 165, 233, 0.2);
+        color: #bae6fd;
+      }
+
+      .level-cell.done {
+        border-color: rgba(16, 185, 129, 0.45);
+        background: rgba(16, 185, 129, 0.12);
+        color: #a7f3d0;
+      }
+
+      .level-cell:disabled {
+        border-color: rgba(30, 41, 59, 0.8);
+        background: rgba(15, 23, 42, 0.5);
+        color: #475569;
+        cursor: not-allowed;
+      }
+
+      .pour-overlay {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .animate-tube-shake {
+        animation: tube-shake 180ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      }
+
+      .animate-liquid-shimmer {
+        animation: liquid-shimmer 2.8s ease-in-out infinite;
+      }
+
+      .animate-confetti-fall {
+        animation: confetti-fall 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes tube-shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-6px) rotate(-2deg); }
+        45% { transform: translateX(5px) rotate(2deg); }
+        70% { transform: translateX(-4px) rotate(-1deg); }
+        85% { transform: translateX(2px) rotate(1deg); }
+      }
+
+      @keyframes liquid-shimmer {
+        0%, 100% { opacity: 0.35; transform: translateY(0px); }
+        50% { opacity: 0.65; transform: translateY(-1.5px); }
+      }
+
+      @keyframes tutorial-bob {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-7px) scale(1.06); }
+      }
+
+      @keyframes bubble-rise {
+        0% { transform: translate3d(0, 24px, 0) scale(0.92); opacity: 0; }
+        15% { opacity: var(--bubble-opacity, 0.22); }
+        85% { opacity: var(--bubble-opacity, 0.22); }
+        100% { transform: translate3d(var(--bubble-drift, 14px), -140px, 0) scale(1.06); opacity: 0; }
+      }
+
+      @keyframes ambient-pulse {
+        0%, 100% { transform: scale(1) translate3d(0, 0, 0); opacity: 0.78; }
+        50% { transform: scale(1.06) translate3d(10px, -8px, 0); opacity: 1; }
+      }
+
+      @keyframes confetti-fall {
+        0% { opacity: 1; transform: translateY(-12px) rotate(0deg) scale(0.9); }
+        100% { opacity: 0; transform: translateY(140px) rotate(260deg) scale(0.6); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .studio-glow-1, .studio-glow-2, .particle-bubble,
+        .animate-tube-shake, .animate-liquid-shimmer, .tutorial-pill, .animate-confetti-fall {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Ambient soft-light atmospheric overlay spanning the entire screen -->
+    <div aria-hidden="true" class="ambient-softlight-layer">
+      <div class="soft-orb soft-orb-1"></div>
+      <div class="soft-orb soft-orb-2"></div>
+      <div class="soft-orb soft-orb-3"></div>
+    </div>
+
+    <div id="app"></div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const TUBE_CAPACITY = 4;
+        const TOTAL_CAMPAIGN_LEVELS = 30;
+        const MAX_EXTRA_GLASSES = 2;
+        const STORAGE_KEY = "water_sort_puzzle_progress_v1";
+
+        const LIQUID_PALETTE = {
+          crimson: { label: "Ruby Red", topColor: "#FB7185", bodyColor: "#E11D48", deepColor: "#9F1239", glowColor: "rgba(225, 29, 72, 0.45)", symbol: "●" },
+          azure: { label: "Sky Azure", topColor: "#38BDF8", bodyColor: "#0284C7", deepColor: "#075985", glowColor: "rgba(2, 132, 199, 0.45)", symbol: "▲" },
+          emerald: { label: "Emerald", topColor: "#34D399", bodyColor: "#059669", deepColor: "#065F46", glowColor: "rgba(5, 150, 105, 0.45)", symbol: "■" },
+          amber: { label: "Amber", topColor: "#FBBF24", bodyColor: "#D97706", deepColor: "#92400E", glowColor: "rgba(217, 119, 6, 0.45)", symbol: "◆" },
+          violet: { label: "Violet", topColor: "#A78BFA", bodyColor: "#7C3AED", deepColor: "#4C1D95", glowColor: "rgba(124, 58, 237, 0.45)", symbol: "★" },
+          coral: { label: "Coral Orange", topColor: "#FB923C", bodyColor: "#EA580C", deepColor: "#9A3412", glowColor: "rgba(234, 88, 12, 0.45)", symbol: "✚" },
+          teal: { label: "Aqua Teal", topColor: "#2DD4BF", bodyColor: "#0D9488", deepColor: "#115E59", glowColor: "rgba(13, 148, 136, 0.45)", symbol: "✖" },
+          magenta: { label: "Magenta", topColor: "#F472B6", bodyColor: "#DB2777", deepColor: "#831843", glowColor: "rgba(219, 39, 119, 0.45)", symbol: "▼" },
+          lime: { label: "Electric Lime", topColor: "#A3E635", bodyColor: "#65A30D", deepColor: "#3F6212", glowColor: "rgba(101, 163, 13, 0.45)", symbol: "◈" },
+          indigo: { label: "Cobalt Indigo", topColor: "#818CF8", bodyColor: "#4F46E5", deepColor: "#312E81", glowColor: "rgba(79, 70, 229, 0.45)", symbol: "⬟" },
+          rose: { label: "Blush Rose", topColor: "#FDA4AF", bodyColor: "#F43F5E", deepColor: "#BE123C", glowColor: "rgba(244, 63, 94, 0.45)", symbol: "☀" },
+          gold: { label: "Solar Gold", topColor: "#FDE047", bodyColor: "#CA8A04", deepColor: "#713F12", glowColor: "rgba(202, 138, 4, 0.45)", symbol: "☾" }
+        };
+
+        const ALL_LIQUID_COLORS = [
+          "azure", "coral", "emerald", "amber", "violet", "crimson",
+          "teal", "magenta", "lime", "indigo", "rose", "gold"
+        ];
+
+        const CHAPTER_TITLES = {
+          "Easy Warm-Up": ["First Pour", "Twin Streams", "Clear Waters", "Gentle Mix", "Balanced Flow"],
+          "Color Tangled": [
+            "Cross Currents", "Prism Lock", "Layered Depth", "Tight Quarters", "Tangled Hues",
+            "Double Stack", "Spectrum Shift", "Deep Channel", "Color Matrix", "Narrow Escape"
+          ],
+          "Master Puzzle": [
+            "Alchemist Vault", "Eightfold Path", "Glass Labyrinth", "Chromatic Knot", "Master Cascade",
+            "Ninefold Riddle", "Mirror Vessels", "Deadlock Breaker", "Crystal Crucible", "Prism Apex",
+            "Tenfold Vortex", "Obsidian Trial", "Grand Confluence", "Sovereign Flask", "Final Equilibrium"
+          ]
+        };
+
+        const AMBIENT_PARTICLES = [
+          { left: "7%", top: "82%", size: 18, duration: "18s", delay: "-2s", opacity: 0.22, drift: "14px", kind: "bubble" },
+          { left: "14%", top: "42%", size: 8, duration: "15s", delay: "-6s", opacity: 0.30, drift: "-10px", kind: "mote" },
+          { left: "22%", top: "74%", size: 24, duration: "22s", delay: "-9s", opacity: 0.16, drift: "18px", kind: "bubble" },
+          { left: "31%", top: "26%", size: 6, duration: "14s", delay: "-4s", opacity: 0.26, drift: "12px", kind: "mote" },
+          { left: "43%", top: "86%", size: 14, duration: "19s", delay: "-11s", opacity: 0.20, drift: "-14px", kind: "bubble" },
+          { left: "54%", top: "34%", size: 7, duration: "16s", delay: "-3s", opacity: 0.24, drift: "8px", kind: "mote" },
+          { left: "66%", top: "78%", size: 22, duration: "21s", delay: "-14s", opacity: 0.17, drift: "-16px", kind: "bubble" },
+          { left: "74%", top: "48%", size: 10, duration: "17s", delay: "-7s", opacity: 0.22, drift: "10px", kind: "bubble" },
+          { left: "83%", top: "24%", size: 6, duration: "13s", delay: "-5s", opacity: 0.28, drift: "-12px", kind: "mote" },
+          { left: "89%", top: "70%", size: 20, duration: "20s", delay: "-12s", opacity: 0.18, drift: "-10px", kind: "bubble" },
+          { left: "94%", top: "44%", size: 8, duration: "16s", delay: "-8s", opacity: 0.22, drift: "-8px", kind: "mote" }
+        ];
+
+        function showGameMonetizeBanner() {
+          try {
+            if (window.sdk && typeof window.sdk.showBanner === "function") {
+              window.sdk.showBanner();
+            }
+          } catch (e) {}
+        }
+
+        /* Web Audio Procedural Synthesizer */
+        const soundEngine = {
+          ctx: null,
+          userMuted: false,
+          sdkPaused: false,
+          isMuted() {
+            return this.userMuted || this.sdkPaused;
+          },
+          setUserMuted(m) {
+            this.userMuted = m;
+            this.sync();
+          },
+          setSdkPaused(p) {
+            this.sdkPaused = p;
+            this.sync();
+          },
+          sync() {
+            if (!this.ctx) return;
+            if (this.isMuted() && this.ctx.state === "running") {
+              this.ctx.suspend().catch(() => {});
+            } else if (!this.isMuted() && this.ctx.state === "suspended") {
+              this.ctx.resume().catch(() => {});
+            }
+          },
+          getCtx() {
+            if (this.isMuted()) return null;
+            if (!this.ctx) {
+              const Ctx = window.AudioContext || window.webkitAudioContext;
+              if (!Ctx) return null;
+              this.ctx = new Ctx();
+            }
+            if (this.ctx.state === "suspended") {
+              this.ctx.resume().catch(() => {});
+            }
+            return this.ctx;
+          },
+          playTone(type, f1, f2, dur, vol, delay) {
+            const ctx = this.getCtx();
+            if (!ctx) return;
+            const now = ctx.currentTime + (delay || 0);
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(f1, now);
+            if (f2 !== f1) osc.frequency.exponentialRampToValueAtTime(f2, now + dur);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + dur + 0.02);
+          },
+          playSelect() { this.playTone("sine", 520, 760, 0.075, 0.08, 0); },
+          playDeselect() { this.playTone("sine", 540, 360, 0.065, 0.06, 0); },
+          playInvalid() { this.playTone("triangle", 190, 125, 0.11, 0.09, 0); },
+          playUndo() { this.playTone("sine", 620, 340, 0.09, 0.065, 0); },
+          playPour(units) {
+            const drops = Math.max(1, Math.min(units, 4));
+            this.playTone("triangle", 280, 440 + drops * 65, 0.16 + drops * 0.055, 0.085, 0);
+            for (let i = 0; i < drops; i++) {
+              const base = 580 + i * 90;
+              this.playTone("sine", base, base * 1.45, 0.05, 0.05, 0.05 + i * 0.06);
+            }
+          },
+          playTubeComplete() {
+            [587.33, 739.99, 880, 1174.66].forEach((f, i) => {
+              this.playTone("sine", f, f, 0.28, 0.075, i * 0.055);
+            });
+          },
+          playAddGlass() {
+            [523.25, 659.25, 1046.5].forEach((f, i) => {
+              this.playTone("triangle", f, f, 0.22, 0.07, i * 0.045);
+            });
+          },
+          playVictory() {
+            [523.25, 659.25, 783.99, 1046.5, 1318.51].forEach((f, i) => {
+              this.playTone("sine", f, f, 0.48, 0.09, i * 0.075);
+            });
+          }
+        };
+
+        /* Core Game Logic */
+        function isTubeEmpty(t) { return t.length === 0; }
+        function isTubeUniform(t) { return t.length > 0 && t.every((c) => c === t[0]); }
+        function isTubeSolved(t) { return t.length === TUBE_CAPACITY && isTubeUniform(t); }
+        function getTopColor(t) { return t.length ? t[t.length - 1] : null; }
+        function getContiguousTopCount(t) {
+          if (!t.length) return 0;
+          const top = t[t.length - 1];
+          let count = 0;
+          for (let i = t.length - 1; i >= 0; i--) {
+            if (t[i] === top) count++; else break;
+          }
+          return count;
+        }
+        function canPour(src, dst) {
+          if (!src.length || dst.length >= TUBE_CAPACITY || isTubeSolved(src)) return false;
+          if (!dst.length) return true;
+          return getTopColor(src) === getTopColor(dst);
+        }
+        function getPourAmount(src, dst) {
+          if (!canPour(src, dst)) return 0;
+          return Math.min(getContiguousTopCount(src), TUBE_CAPACITY - dst.length);
+        }
+        function applyPour(tubes, fromIdx, toIdx) {
+          if (fromIdx === toIdx) return null;
+          const src = tubes[fromIdx], dst = tubes[toIdx];
+          if (!src || !dst) return null;
+          const amount = getPourAmount(src, dst);
+          if (amount <= 0) return null;
+          const color = src[src.length - 1];
+          const nextTubes = tubes.map((t) => t.slice());
+          for (let i = 0; i < amount; i++) nextTubes[toIdx].push(nextTubes[fromIdx].pop());
+          return { nextTubes, pouredCount: amount, color };
+        }
+        function isLevelWon(tubes) {
+          return tubes.every((t) => isTubeEmpty(t) || isTubeSolved(t));
+        }
+        function hasAnyLegalMove(tubes) {
+          for (let i = 0; i < tubes.length; i++) {
+            const src = tubes[i];
+            if (!src.length || isTubeSolved(src)) continue;
+            for (let j = 0; j < tubes.length; j++) {
+              if (i === j) continue;
+              const dst = tubes[j];
+              if (!dst.length && isTubeUniform(src)) continue;
+              if (canPour(src, dst)) return true;
+            }
+          }
+          return false;
+        }
+
+        /* Deterministic Verified-Solvable Level Generator */
+        function mulberry32(seed) {
+          let a = seed >>> 0;
+          return function () {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+
+        function canonicalHash(tubes) {
+          return tubes.map((t) => t.join(",")).sort().join("|");
+        }
+
+        function scoreBoard(tubes) {
+          let score = 0;
+          for (const t of tubes) {
+            if (!t.length) { score += 4; continue; }
+            if (isTubeSolved(t)) { score += 40; continue; }
+            const bottom = t[0];
+            let run = 0;
+            for (let i = 0; i < t.length; i++) {
+              if (t[i] === bottom) run++; else break;
+            }
+            score += run * run * 2;
+            for (let i = 1; i < t.length; i++) {
+              if (t[i] !== t[i - 1]) score -= 3;
+            }
+          }
+          return score;
+        }
+
+        function solvePuzzleMoves(initialTubes, maxVisited) {
+          const visited = new Set();
+          let nodes = 0;
+          let solutionDepth = null;
+
+          function dfs(tubes, depth, maxDepth) {
+            if (solutionDepth !== null || nodes > maxVisited || depth > maxDepth) return false;
+            if (isLevelWon(tubes)) { solutionDepth = depth; return true; }
+            const hash = canonicalHash(tubes);
+            if (visited.has(hash)) return false;
+            visited.add(hash);
+            nodes++;
+
+            const candidates = [];
+            let usedEmpty = false;
+            for (let i = 0; i < tubes.length; i++) {
+              const src = tubes[i];
+              if (!src.length || isTubeSolved(src)) continue;
+              const srcTop = getTopColor(src);
+              const srcUniform = isTubeUniform(src);
+              const count = getContiguousTopCount(src);
+
+              for (let j = 0; j < tubes.length; j++) {
+                if (i === j) continue;
+                const dst = tubes[j];
+                if (dst.length >= TUBE_CAPACITY) continue;
+                if (!dst.length) {
+                  if (srcUniform || usedEmpty) continue;
+                  usedEmpty = true;
+                } else if (getTopColor(dst) !== srcTop) {
+                  continue;
+                }
+                const moveAmt = Math.min(count, TUBE_CAPACITY - dst.length);
+                if (moveAmt <= 0) continue;
+                if (!dst.length && moveAmt < count) continue;
+
+                const next = tubes.map((t) => t.slice());
+                for (let k = 0; k < moveAmt; k++) next[j].push(next[i].pop());
+                let p = scoreBoard(next);
+                if (isTubeSolved(next[j])) p += 50;
+                if (dst.length && isTubeUniform(dst)) p += 20;
+                if (!next[i].length) p += 12;
+                candidates.push({ priority: p, next });
+              }
+            }
+            candidates.sort((a, b) => b.priority - a.priority);
+            for (const m of candidates) {
+              if (dfs(m.next, depth + 1, maxDepth)) return true;
+              if (nodes > maxVisited) break;
+            }
+            return false;
+          }
+
+          dfs(initialTubes, 0, initialTubes.length * 4 + 12);
+          return solutionDepth;
+        }
+
+        function getLevelSpec(n) {
+          if (n <= 5) {
+            const cMap = [2, 3, 3, 4, 4];
+            const eMap = [1, 2, 2, 2, 2];
+            return {
+              tier: "Easy Warm-Up",
+              colorCount: cMap[n - 1],
+              emptyCount: eMap[n - 1],
+              title: CHAPTER_TITLES["Easy Warm-Up"][n - 1]
+            };
+          }
+          if (n <= 15) {
+            let colorCount = 5;
+            if (n >= 9 && n <= 11) colorCount = 6;
+            else if (n >= 12) colorCount = 7;
+            return {
+              tier: "Color Tangled",
+              colorCount,
+              emptyCount: 2,
+              title: CHAPTER_TITLES["Color Tangled"][n - 6]
+            };
+          }
+          let colorCount = 8;
+          if (n >= 21 && n <= 25) colorCount = 9;
+          else if (n >= 26 && n <= 30) colorCount = 10;
+          else if (n > 30) colorCount = Math.min(12, 9 + ((n - 31) % 4));
+          return {
+            tier: "Master Puzzle",
+            colorCount,
+            emptyCount: 2,
+            title: CHAPTER_TITLES["Master Puzzle"][n - 16] || ("Master Trial " + n)
+          };
+        }
+
+        const levelCache = new Map();
+        function getLevelConfig(n) {
+          if (levelCache.has(n)) return levelCache.get(n);
+          const spec = getLevelSpec(n);
+
+          if (n === 1) {
+            const cfg = {
+              levelNumber: 1, tier: spec.tier, title: spec.title,
+              colorCount: 2, emptyCount: 1, parMoves: 3,
+              initialTubes: [
+                ["azure", "azure", "coral", "coral"],
+                ["coral", "coral", "azure", "azure"],
+                []
+              ]
+            };
+            levelCache.set(1, cfg);
+            return cfg;
+          }
+          if (n === 2) {
+            const cfg = {
+              levelNumber: 2, tier: spec.tier, title: spec.title,
+              colorCount: 3, emptyCount: 2, parMoves: 6,
+              initialTubes: [
+                ["azure", "emerald", "coral", "azure"],
+                ["coral", "azure", "emerald", "coral"],
+                ["emerald", "coral", "azure", "emerald"],
+                [], []
+              ]
+            };
+            levelCache.set(2, cfg);
+            return cfg;
+          }
+
+          const baseColors = ALL_LIQUID_COLORS.slice(0, spec.colorCount);
+          const rotated = [];
+          const offset = (n * 3) % ALL_LIQUID_COLORS.length;
+          for (let i = 0; i < spec.colorCount; i++) {
+            rotated.push(ALL_LIQUID_COLORS[(offset + i) % ALL_LIQUID_COLORS.length]);
+          }
+
+          const minMixed = Math.max(spec.colorCount * 2, Math.floor(spec.colorCount * 2.2));
+          let chosen = null, parMoves = spec.colorCount * 3;
+          for (let attempt = 0; attempt < 120; attempt++) {
+            const rng = mulberry32(n * 7919 + attempt * 104729 + 31337);
+            const palette = attempt % 2 === 0 ? rotated : baseColors;
+            const pool = [];
+            for (const c of palette) for (let k = 0; k < TUBE_CAPACITY; k++) pool.push(c);
+            for (let i = pool.length - 1; i > 0; i--) {
+              const j = Math.floor(rng() * (i + 1));
+              [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            const tubes = [];
+            for (let i = 0; i < spec.colorCount; i++) {
+              tubes.push(pool.slice(i * TUBE_CAPACITY, (i + 1) * TUBE_CAPACITY));
+            }
+            let transitions = 0, bad = false;
+            for (const t of tubes) {
+              if (isTubeSolved(t)) { bad = true; break; }
+              for (let i = 1; i < t.length; i++) if (t[i] !== t[i - 1]) transitions++;
+            }
+            if (bad || transitions < (attempt > 60 ? spec.colorCount + 2 : minMixed)) continue;
+            for (let e = 0; e < spec.emptyCount; e++) tubes.push([]);
+            const solvedIn = solvePuzzleMoves(tubes, 7500);
+            if (solvedIn !== null && solvedIn >= spec.colorCount) {
+              chosen = tubes;
+              parMoves = solvedIn;
+              break;
+            }
+          }
+
+          if (!chosen) {
+            chosen = [];
+            for (let i = 0; i < spec.colorCount; i++) {
+              chosen.push([
+                rotated[i],
+                rotated[(i + 1) % spec.colorCount],
+                rotated[(i + 2) % spec.colorCount],
+                rotated[(i + 1) % spec.colorCount]
+              ]);
+            }
+            for (let e = 0; e < spec.emptyCount; e++) chosen.push([]);
+          }
+
+          const cfg = {
+            levelNumber: n, tier: spec.tier, title: spec.title,
+            colorCount: spec.colorCount, emptyCount: spec.emptyCount,
+            parMoves, initialTubes: chosen
+          };
+          levelCache.set(n, cfg);
+          return cfg;
+        }
+
+        /* Icons (Crisp Inline SVGs) */
+        const ICONS = {
+          play: `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>`,
+          grid: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>`,
+          volOn: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`,
+          volOff: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>`,
+          eye: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>`,
+          pause: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg>`,
+          undo: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>`,
+          plus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`,
+          restart: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
+          check: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+          lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+          close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
+          arrow: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`,
+          home: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`
+        };
+
+        /* State & Persistence */
+        function loadProgress() {
+          const def = { currentLevel: 1, highestUnlockedLevel: 1, completedLevels: [], isMuted: false, showSymbols: false };
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return def;
+            const p = JSON.parse(raw);
+            return {
+              currentLevel: typeof p.currentLevel === "number" && p.currentLevel >= 1 ? p.currentLevel : 1,
+              highestUnlockedLevel: typeof p.highestUnlockedLevel === "number" && p.highestUnlockedLevel >= 1 ? p.highestUnlockedLevel : 1,
+              completedLevels: Array.isArray(p.completedLevels) ? p.completedLevels.filter((n) => typeof n === "number") : [],
+              isMuted: Boolean(p.isMuted),
+              showSymbols: Boolean(p.showSymbols)
+            };
+          } catch (e) { return def; }
+        }
+
+        const saved = loadProgress();
+        const state = {
+          gameState: "TITLE_MENU",
+          currentLevel: saved.currentLevel,
+          highestUnlockedLevel: saved.highestUnlockedLevel,
+          completedLevels: saved.completedLevels,
+          isMuted: saved.isMuted,
+          showSymbols: saved.showSymbols,
+          isLevelSelectOpen: false,
+          openedFromTitle: false,
+          tubes: [],
+          selectedIndex: null,
+          invalidShakeIndex: null,
+          history: [],
+          moves: 0,
+          extraGlassesUsed: 0,
+          pourAnim: null,
+          lastMoves: 0,
+          wonLocked: false
+        };
+
+        soundEngine.setUserMuted(state.isMuted);
+
+        function saveProgress() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+              currentLevel: state.currentLevel,
+              highestUnlockedLevel: state.highestUnlockedLevel,
+              completedLevels: state.completedLevels,
+              isMuted: state.isMuted,
+              showSymbols: state.showSymbols
+            }));
+          } catch (e) {}
+        }
+
+        function startLevel(levelNum) {
+          const cfg = getLevelConfig(levelNum);
+          state.currentLevel = levelNum;
+          state.tubes = cfg.initialTubes.map((t) => t.slice());
+          state.selectedIndex = null;
+          state.invalidShakeIndex = null;
+          state.history = [];
+          state.moves = 0;
+          state.extraGlassesUsed = 0;
+          state.pourAnim = null;
+          state.wonLocked = false;
+          saveProgress();
+        }
+
+        /* Rendering Helpers */
+        function renderStudioBackdrop() {
+          const particles = AMBIENT_PARTICLES.map((p) => {
+            const bg = p.kind === "mote"
+              ? "radial-gradient(circle, rgba(186,230,253,0.9) 0%, rgba(56,189,248,0.25) 55%, transparent 100%); filter:blur(0.5px);"
+              : "radial-gradient(circle at 32% 30%, rgba(255,255,255,0.32) 0%, rgba(125,211,252,0.08) 48%, rgba(56,189,248,0.03) 100%); border:1px solid rgba(186,230,253,0.24); box-shadow:inset 0 1px 2px rgba(255,255,255,0.22);";
+            return `<span class="particle-bubble" style="left:${p.left};top:${p.top};width:${p.size}px;height:${p.size}px;--bubble-duration:${p.duration};--bubble-opacity:${p.opacity};--bubble-drift:${p.drift};animation-delay:${p.delay};${bg}"></span>`;
+          }).join("");
+
+          return `
+            <div aria-hidden="true" class="studio-backdrop">
+              <div class="studio-glow-1"></div>
+              <div class="studio-glow-2"></div>
+              <div class="studio-glow-3"></div>
+              <div class="studio-spotlight"></div>
+              ${particles}
+              <div class="studio-vignette"></div>
+            </div>
+          `;
+        }
+
+        function renderShelf(compact) {
+          return `
+            <div aria-hidden="true" class="tube-shelf ${compact ? "compact" : ""}">
+              <div class="shelf-edge"></div>
+              <div class="shelf-body"></div>
+              <div class="shelf-glow"></div>
+            </div>
+          `;
+        }
+
+        let tubeUidCounter = 0;
+        function renderTubeHTML(tube, idx, opts) {
+          const uid = "t" + (++tubeUidCounter);
+          const solved = isTubeSolved(tube);
+          const isSelected = opts.isSelected;
+          const isValidTarget = opts.isValidTarget;
+          const isPourSource = opts.isPourSource;
+          const tiltDir = opts.tiltDir;
+          const unitH = 38.5, cavityBottom = 196;
+
+          let transform = "translateY(0px) rotate(0deg)";
+          let z = 10;
+          if (isPourSource && tiltDir) {
+            const ang = tiltDir === "right" ? 32 : -32;
+            const sx = tiltDir === "right" ? 10 : -10;
+            transform = `translate(${sx}px, -22px) rotate(${ang}deg)`;
+            z = 30;
+          } else if (isSelected) {
+            transform = "translateY(-16px) rotate(0deg)";
+            z = 20;
+          }
+
+          const topColor = tube.length ? LIQUID_PALETTE[tube[tube.length - 1]] : null;
+          const floorOpacity = (isSelected || solved) ? 0.9 : 0;
+          const floorColor = solved ? "rgba(52,211,153,0.55)" : (topColor ? topColor.glowColor : "rgba(56,189,248,0.5)");
+
+          const layersSVG = tube.map((colorId, layerIdx) => {
+            const pal = LIQUID_PALETTE[colorId];
+            const isTop = layerIdx === tube.length - 1;
+            const yBot = cavityBottom - layerIdx * unitH;
+            const rectY = yBot - unitH;
+            const rectH = layerIdx === 0 ? unitH + 6 : unitH + 1.5;
+
+            const sepLine = (!isTop && tube[layerIdx + 1] !== colorId)
+              ? `<line x1="14" y1="${rectY}" x2="66" y2="${rectY}" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>`
+              : "";
+
+            const meniscus = isTop ? `
+              <ellipse cx="40" cy="${rectY}" rx="25" ry="4.2" fill="${pal.topColor}"/>
+              <ellipse cx="40" cy="${rectY - 0.5}" rx="17" ry="2" fill="rgba(255,255,255,0.32)" class="animate-liquid-shimmer"/>
+            ` : "";
+
+            const sym = opts.showSymbols ? `
+              <text x="40" y="${rectY + unitH * 0.58}" text-anchor="middle" dominant-baseline="middle" fill="#FFFFFF" font-size="14" font-weight="700" style="text-shadow:0 1px 3px rgba(0,0,0,0.75);pointer-events:none;">${pal.symbol}</text>
+            ` : "";
+
+            return `
+              <g>
+                <defs>
+                  <linearGradient id="liq-${uid}-${layerIdx}" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="${pal.deepColor}"/>
+                    <stop offset="32%" stop-color="${pal.bodyColor}"/>
+                    <stop offset="76%" stop-color="${pal.bodyColor}"/>
+                    <stop offset="100%" stop-color="${pal.deepColor}"/>
+                  </linearGradient>
+                </defs>
+                <rect x="13" y="${rectY}" width="54" height="${rectH}" fill="url(#liq-${uid}-${layerIdx})"/>
+                ${sepLine}
+                ${meniscus}
+                ${sym}
+              </g>
+            `;
+          }).join("");
+
+          const strokeColor = solved
+            ? "rgba(52, 211, 153, 0.9)"
+            : isSelected
+              ? "rgba(56, 189, 248, 0.95)"
+              : isValidTarget
+                ? "rgba(255, 255, 255, 0.72)"
+                : "rgba(203, 213, 225, 0.38)";
+          const lipStroke = solved
+            ? "rgba(52, 211, 153, 0.95)"
+            : isSelected
+              ? "rgba(56, 189, 248, 0.95)"
+              : isValidTarget
+                ? "rgba(255, 255, 255, 0.8)"
+                : "rgba(226, 232, 240, 0.5)";
+
+          const tutorialHTML = opts.tutorialRole ? `
+            <div aria-hidden="true" class="tutorial-pill">
+              <span style="background:${opts.tutorialRole === "source" ? "#38bdf8" : "#34d399"}">
+                ${opts.tutorialRole === "source" ? "Tap" : "Pour here"}
+              </span>
+              <svg width="10" height="6" viewBox="0 0 10 6" style="margin-top:2px;">
+                <path d="M0 0 L5 6 L10 0 Z" fill="${opts.tutorialRole === "source" ? "#38bdf8" : "#34d399"}"/>
+              </svg>
+            </div>
+          ` : "";
+
+          return `
+            <div class="tube-slot">
+              ${tutorialHTML}
+              <button type="button" data-tube-idx="${idx}" class="tube-btn tube-${opts.sizeVariant} ${opts.isShaking ? "animate-tube-shake" : ""}" style="transform:${transform};z-index:${z};" aria-label="Glass ${idx + 1}">
+                <span aria-hidden="true" class="tube-floor-glow" style="opacity:${floorOpacity};background:${floorColor};"></span>
+                <svg viewBox="0 0 80 214" style="width:100%;height:100%;overflow:visible;filter:drop-shadow(0 12px 20px rgba(0,0,0,0.45));">
+                  <defs>
+                    <clipPath id="clip-${uid}">
+                      <path d="M15,24 L65,24 L65,171 A25,25 0 0,1 15,171 Z"/>
+                    </clipPath>
+                    <linearGradient id="gbg-${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="rgba(255,255,255,0.13)"/>
+                      <stop offset="22%" stop-color="rgba(255,255,255,0.04)"/>
+                      <stop offset="78%" stop-color="rgba(255,255,255,0.02)"/>
+                      <stop offset="100%" stop-color="rgba(255,255,255,0.11)"/>
+                    </linearGradient>
+                    <linearGradient id="gsh-${uid}" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="rgba(255,255,255,0.42)"/>
+                      <stop offset="65%" stop-color="rgba(255,255,255,0.12)"/>
+                      <stop offset="100%" stop-color="rgba(255,255,255,0.28)"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M14,22 L66,22 L66,171 A26,26 0 0,1 14,171 Z" fill="url(#gbg-${uid})"/>
+                  <g clip-path="url(#clip-${uid})">${layersSVG}</g>
+                  <path d="M20,34 L20,168 A20,20 0 0,0 26,184" fill="none" stroke="url(#gsh-${uid})" stroke-width="3.2" stroke-linecap="round" opacity="0.7"/>
+                  <path d="M60,34 L60,168" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M14,22 L66,22 L66,171 A26,26 0 0,1 14,171 Z" fill="none" stroke="${strokeColor}" stroke-width="${isSelected || solved ? "2.6" : "2"}"/>
+                  <rect x="10" y="16" width="60" height="8" rx="4" fill="rgba(226,232,240,0.14)" stroke="${lipStroke}" stroke-width="1.8"/>
+                  ${isValidTarget && !isSelected ? `<ellipse cx="40" cy="10" rx="20" ry="3.5" fill="none" stroke="rgba(56,189,248,0.85)" stroke-width="1.8" stroke-dasharray="4 3"/>` : ""}
+                  ${solved ? `
+                    <g>
+                      <path d="M23,6 L57,6 L53,19 L27,19 Z" fill="rgba(52,211,153,0.28)" stroke="rgba(110,231,183,0.9)" stroke-width="1.6"/>
+                      <rect x="20" y="3" width="40" height="4.5" rx="2.2" fill="rgba(167,243,208,0.45)" stroke="rgba(110,231,183,0.95)" stroke-width="1.4"/>
+                    </g>
+                  ` : ""}
+                </svg>
+                ${solved ? `<span aria-hidden="true" class="solved-badge">${ICONS.check}</span>` : ""}
+              </button>
+            </div>
+          `;
+        }
+
+        function renderPourStreamSVG(pour) {
+          if (!pour) return "";
+          const pal = LIQUID_PALETTE[pour.color];
+          const { fromRect, toRect, targetFillBefore, count } = pour;
+          const pouringRight = toRect.x >= fromRect.x;
+          const startX = pouringRight ? fromRect.x + fromRect.width * 0.78 : fromRect.x + fromRect.width * 0.22;
+          const startY = fromRect.y - 6;
+          const endX = toRect.x + toRect.width * 0.5;
+          const targetRimY = toRect.y + toRect.height * 0.1;
+          const fillFraction = Math.min(1, (targetFillBefore + count * 0.5) / TUBE_CAPACITY);
+          const liquidSurfaceY = toRect.y + toRect.height * (0.9 - fillFraction * 0.68);
+          const ctrlX = (startX + endX) / 2;
+          const ctrlY = Math.min(startY, targetRimY) - 18;
+          const path = `M ${startX} ${startY} Q ${ctrlX} ${ctrlY} ${endX} ${liquidSurfaceY}`;
+
+          return `
+            <svg aria-hidden="true" class="pour-overlay">
+              <path d="${path}" fill="none" stroke="${pal.topColor}" stroke-width="9" stroke-linecap="round" opacity="0.35"/>
+              <path d="${path}" fill="none" stroke="${pal.bodyColor}" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
+              <path d="${path}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+              <ellipse cx="${endX}" cy="${liquidSurfaceY}" rx="11" ry="3.2" fill="none" stroke="${pal.topColor}" stroke-width="2" opacity="0.85"/>
+            </svg>
+          `;
+        }
+
+        function renderTitleScreen() {
+          const completedCount = state.completedLevels.filter((n) => n <= TOTAL_CAMPAIGN_LEVELS).length;
+          const hasProgress = state.highestUnlockedLevel > 1 || completedCount > 0;
+          const showcase = [
+            ["azure", "azure", "azure", "azure"],
+            ["coral", "emerald", "amber", "coral"],
+            ["violet", "violet", "violet", "violet"]
+          ];
+
+          const showcaseHTML = showcase.map((t, idx) => `
+            <div style="${idx === 1 ? "transform:translateY(-8px)" : "opacity:0.95"}">
+              ${renderTubeHTML(t, idx, { isSelected: idx === 1, sizeVariant: "sm", showSymbols: false })}
+            </div>
+          `).join("");
+
+          return `
+            <div class="screen screen-title">
+              ${renderStudioBackdrop()}
+              <div class="title-top">
+                <button type="button" id="btn-mute" class="icon-btn" aria-label="${state.isMuted ? "Unmute audio" : "Mute audio"}">
+                  ${state.isMuted ? ICONS.volOff : ICONS.volOn}
+                </button>
+              </div>
+              <main class="title-main">
+                <svg viewBox="0 0 460 96" style="width:100%;max-width:440px;height:auto;margin-bottom:12px;filter:drop-shadow(0 6px 24px rgba(14,165,233,0.22));" role="img" aria-label="Water Sort Puzzle">
+                  <defs>
+                    <linearGradient id="title-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#38BDF8"/>
+                      <stop offset="50%" stop-color="#F8FAFC"/>
+                      <stop offset="100%" stop-color="#FB923C"/>
+                    </linearGradient>
+                  </defs>
+                  <text x="230" y="54" text-anchor="middle" fill="url(#title-grad)" font-family="Outfit, sans-serif" font-weight="800" font-size="52" letter-spacing="-1.2">WATER SORT</text>
+                  <text x="230" y="84" text-anchor="middle" fill="#94A3B8" font-family="Plus Jakarta Sans, sans-serif" font-weight="600" font-size="16" letter-spacing="6">COLOR PUZZLE</text>
+                </svg>
+                <p class="title-desc">Pour colored liquids from glass to glass until every vessel holds a single pure hue.</p>
+                <div aria-hidden="true" style="pointer-events:none;display:flex;flex-direction:column;align-items:center;margin-bottom:30px;">
+                  <div style="display:flex;align-items:flex-end;justify-content:center;gap:22px;padding:0 8px;">
+                    ${showcaseHTML}
+                  </div>
+                  ${renderShelf(true)}
+                </div>
+                <div class="title-actions">
+                  <button type="button" id="btn-play" class="btn-primary">
+                    ${ICONS.play}
+                    <span>${hasProgress ? "Continue Level " + state.highestUnlockedLevel : "Play"}</span>
+                  </button>
+                  <button type="button" id="btn-levels" class="btn-secondary">
+                    ${ICONS.grid}
+                    <span>Levels</span>
+                  </button>
+                </div>
+                ${hasProgress ? `<p class="title-progress">${completedCount} of ${TOTAL_CAMPAIGN_LEVELS} campaign levels cleared</p>` : ""}
+              </main>
+              <footer class="title-footer">
+                Tap or Click glass to pour · Z Undo · G Add Glass · R Restart · Esc Pause
+              </footer>
+            </div>
+          `;
+        }
+
+        function renderGameScreen() {
+          const cfg = getLevelConfig(state.currentLevel);
+          const sizeVariant = state.tubes.length <= 5 ? "lg" : (state.tubes.length <= 10 ? "md" : "sm");
+          const rows = state.tubes.length <= 5
+            ? [state.tubes.map((t, i) => ({ tube: t, index: i }))]
+            : (() => {
+                const split = Math.ceil(state.tubes.length / 2);
+                return [
+                  state.tubes.slice(0, split).map((t, i) => ({ tube: t, index: i })),
+                  state.tubes.slice(split).map((t, i) => ({ tube: t, index: split + i }))
+                ];
+              })();
+
+          const showTutorial = cfg.levelNumber === 1 && state.moves === 0 && !state.pourAnim;
+          const isDeadlocked = !state.pourAnim && !state.wonLocked && !isLevelWon(state.tubes) && !hasAnyLegalMove(state.tubes);
+          const extraRemaining = MAX_EXTRA_GLASSES - state.extraGlassesUsed;
+
+          const rowsHTML = rows.map((row) => {
+            const tubesHTML = row.map(({ tube, index }) => {
+              const isSelected = state.selectedIndex === index;
+              const isValidTarget = state.selectedIndex !== null && state.selectedIndex !== index && canPour(state.tubes[state.selectedIndex], tube);
+              const isPourSource = state.pourAnim && state.pourAnim.fromIndex === index;
+              const tiltDir = isPourSource ? (state.pourAnim.toRect.x >= state.pourAnim.fromRect.x ? "right" : "left") : null;
+              let tutorialRole = null;
+              if (showTutorial) {
+                if (state.selectedIndex === null && index === 0) tutorialRole = "source";
+                else if (state.selectedIndex !== null && index === 2) tutorialRole = "target";
+              }
+              return renderTubeHTML(tube, index, {
+                isSelected, isValidTarget, isShaking: state.invalidShakeIndex === index,
+                isPourSource, tiltDir, showSymbols: state.showSymbols, tutorialRole, sizeVariant
+              });
+            }).join("");
+
+            return `
+              <div class="tube-row-wrap">
+                <div class="tube-row">${tubesHTML}</div>
+                ${renderShelf(sizeVariant === "sm")}
+              </div>
+            `;
+          }).join("");
+
+          return `
+            <div class="screen">
+              ${renderStudioBackdrop()}
+              <header class="game-header">
+                <div>
+                  <div class="hud-meta">
+                    <span>${cfg.tier}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Moves ${state.moves}</span>
+                  </div>
+                  <h1 class="hud-title">Level ${cfg.levelNumber} — ${cfg.title}</h1>
+                </div>
+                <div class="hud-buttons">
+                  <button type="button" id="btn-symbols" class="icon-btn ${state.showSymbols ? "active" : ""}" aria-label="Toggle color symbols" title="Color Symbols">
+                    ${ICONS.eye}
+                  </button>
+                  <button type="button" id="btn-mute" class="icon-btn" aria-label="Toggle audio" title="Mute / Unmute">
+                    ${state.isMuted ? ICONS.volOff : ICONS.volOn}
+                  </button>
+                  <button type="button" id="btn-pause" class="icon-btn" aria-label="Pause game" title="Pause (Esc)">
+                    ${ICONS.pause}
+                  </button>
+                </div>
+              </header>
+
+              <main class="playfield">
+                ${showTutorial ? `<p class="tutorial-hint">${state.selectedIndex === null ? "Tap a glass to pick it up, then tap an empty glass or matching top color to pour." : "Now tap the empty glass to pour the matching liquid."}</p>` : ""}
+                <div id="board-container" class="board-container">
+                  ${renderPourStreamSVG(state.pourAnim)}
+                  ${rowsHTML}
+                </div>
+                ${isDeadlocked ? `<div role="status" class="deadlock-banner">No legal moves left — Undo a step, add a glass, or Restart.</div>` : ""}
+              </main>
+
+              <footer class="action-bar">
+                <button type="button" id="btn-undo" class="btn-secondary action-btn" ${state.history.length === 0 || state.pourAnim ? "disabled" : ""} title="Undo (Z)">
+                  ${ICONS.undo}
+                  <span>Undo</span>
+                  ${state.history.length > 0 ? `<span class="mono-count">(${state.history.length})</span>` : ""}
+                </button>
+                <button type="button" id="btn-add-glass" class="btn-secondary action-btn" ${extraRemaining <= 0 || state.pourAnim ? "disabled" : ""} title="Add Glass (G)">
+                  ${ICONS.plus}
+                  <span>Add Glass</span>
+                  <span class="mono-count">(${extraRemaining})</span>
+                </button>
+                <button type="button" id="btn-restart" class="btn-secondary action-btn" ${state.pourAnim ? "disabled" : ""} title="Restart (R)">
+                  ${ICONS.restart}
+                  <span>Restart</span>
+                </button>
+              </footer>
+            </div>
+          `;
+        }
+
+        function renderModals() {
+          if (state.gameState === "PAUSED") {
+            if (state.isLevelSelectOpen) {
+              const chapters = [
+                { name: "Easy Warm-Up", start: 1, end: 5 },
+                { name: "Color Tangled", start: 6, end: 15 },
+                { name: "Master Puzzle", start: 16, end: 30 }
+              ];
+              const completedSet = new Set(state.completedLevels);
+              const sections = chapters.map((ch) => {
+                let cells = "";
+                for (let lv = ch.start; lv <= ch.end; lv++) {
+                  const unlocked = lv <= state.highestUnlockedLevel;
+                  const done = completedSet.has(lv);
+                  const cur = lv === state.currentLevel;
+                  const cls = cur ? "current" : (done ? "done" : "");
+                  cells += `
+                    <button type="button" data-select-level="${lv}" class="level-cell ${cls}" ${unlocked ? "" : "disabled"}>
+                      ${unlocked ? `<span>${lv}</span>${done ? `<span style="position:absolute;top:4px;right:4px;color:#34d399;">${ICONS.check}</span>` : ""}` : ICONS.lock}
+                    </button>
+                  `;
+                }
+                return `
+                  <section>
+                    <div class="chapter-head">
+                      <h3>${ch.name}</h3>
+                      <span>Levels ${ch.start}–${ch.end}</span>
+                    </div>
+                    <div class="level-grid">${cells}</div>
+                  </section>
+                `;
+              }).join("");
+
+              return `
+                <div class="modal-backdrop" role="dialog" aria-modal="true">
+                  <div class="modal-card">
+                    <div class="modal-header">
+                      <h2 class="modal-title">Select Level</h2>
+                      <button type="button" id="btn-modal-close" class="icon-btn" style="width:40px;height:40px;border:none;background:transparent;">${ICONS.close}</button>
+                    </div>
+                    <div class="level-scroll">${sections}</div>
+                  </div>
+                </div>
+              `;
+            }
+
+            return `
+              <div class="modal-backdrop" role="dialog" aria-modal="true">
+                <div class="modal-card">
+                  <div class="modal-header">
+                    <h2 class="modal-title">Level ${state.currentLevel} Paused</h2>
+                    <button type="button" id="btn-modal-close" class="icon-btn" style="width:40px;height:40px;border:none;background:transparent;">${ICONS.close}</button>
+                  </div>
+                  <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px;">
+                    <button type="button" id="btn-resume" class="btn-primary" style="width:100%;">${ICONS.play}<span>Continue</span></button>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                      <button type="button" id="btn-modal-restart" class="btn-secondary">${ICONS.restart}<span>Restart</span></button>
+                      <button type="button" id="btn-modal-levels" class="btn-secondary"><span>All Levels</span></button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                      <button type="button" id="btn-modal-mute" class="btn-secondary">${state.isMuted ? ICONS.volOff + "<span>Sound Off</span>" : ICONS.volOn + "<span>Sound On</span>"}</button>
+                      <button type="button" id="btn-modal-symbols" class="btn-secondary">${ICONS.eye}<span>${state.showSymbols ? "Symbols On" : "Symbols Off"}</span></button>
+                    </div>
+                    <button type="button" id="btn-modal-home" class="btn-secondary" style="border-color:#1e293b;background:transparent;color:#94a3b8;">${ICONS.home}<span>Title Screen</span></button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+
+          if (state.gameState === "ROUND_SUMMARY") {
+            const cfg = getLevelConfig(state.currentLevel);
+            const efficient = state.lastMoves <= cfg.parMoves + 3;
+            const confetti = ["#38BDF8", "#FB923C", "#34D399", "#FBBF24", "#A78BFA", "#FB7185"].map((c, idx) =>
+              `<span class="animate-confetti-fall" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${c};animation-delay:${idx * 70}ms;"></span>`
+            ).join("");
+
+            return `
+              <div class="modal-backdrop" role="dialog" aria-modal="true">
+                <div aria-hidden="true" style="pointer-events:none;position:absolute;top:22%;left:0;right:0;display:flex;justify-content:center;gap:24px;">${confetti}</div>
+                <div class="modal-card modal-card-sm">
+                  <div style="margin:0 auto 14px;width:54px;height:54px;border-radius:16px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#34d399;display:flex;align-items:center;justify-content:center;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </div>
+                  <p style="margin:0;font-size:12px;font-weight:600;color:#34d399;letter-spacing:0.05em;">Level ${state.currentLevel} Cleared</p>
+                  <h2 class="modal-title" style="margin-top:4px;font-size:24px;">${cfg.title}</h2>
+                  <div style="margin-top:20px;padding:14px 0;border-top:1px solid #1e293b;border-bottom:1px solid #1e293b;display:flex;justify-content:center;align-items:center;gap:24px;">
+                    <div><div style="font-size:12px;color:#94a3b8;">Moves</div><div style="font-family:var(--font-mono);font-size:18px;font-weight:600;">${state.lastMoves}</div></div>
+                    <div style="width:1px;height:28px;background:#1e293b;"></div>
+                    <div><div style="font-size:12px;color:#94a3b8;">Rating</div><div style="font-weight:600;color:#7dd3fc;">${efficient ? "Masterful" : "Solved"}</div></div>
+                  </div>
+                  <div style="margin-top:22px;display:flex;flex-direction:column;gap:10px;">
+                    <button type="button" id="btn-next-level" class="btn-primary" style="width:100%;"><span>Next Level</span>${ICONS.arrow}</button>
+                    <button type="button" id="btn-replay-level" class="btn-secondary" style="width:100%;">${ICONS.restart}<span>Replay Level</span></button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+
+          if (state.gameState === "ALL_COMPLETE") {
+            return `
+              <div class="modal-backdrop" role="dialog" aria-modal="true">
+                <div class="modal-card modal-card-sm" style="max-width:440px;border-color:rgba(245,158,11,0.35);">
+                  <div style="margin:0 auto 14px;width:60px;height:60px;border-radius:16px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;display:flex;align-items:center;justify-content:center;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                  </div>
+                  <p style="margin:0;font-size:12px;font-weight:600;color:#fbbf24;letter-spacing:0.05em;">All ${TOTAL_CAMPAIGN_LEVELS} Levels Mastered</p>
+                  <h2 class="modal-title" style="margin-top:4px;font-size:28px;">Puzzle Champion</h2>
+                  <p style="margin:10px 0 0;font-size:14px;line-height:1.6;color:#cbd5e1;">You sorted every vessel through Easy Warm-Up, Color Tangled, and Master Puzzle challenges in ${state.lastMoves} moves.</p>
+                  <div style="margin-top:22px;display:flex;flex-direction:column;gap:10px;">
+                    <button type="button" id="btn-endless" class="btn-primary" style="width:100%;"><span>Play Endless Master Mode</span>${ICONS.arrow}</button>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                      <button type="button" id="btn-replay-campaign" class="btn-secondary">${ICONS.restart}<span>Level 1</span></button>
+                      <button type="button" id="btn-modal-home" class="btn-secondary">${ICONS.home}<span>Title</span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+
+          return "";
+        }
+
+        const appRoot = document.getElementById("app");
+        let activeTimers = [];
+        function clearTimers() {
+          activeTimers.forEach((id) => clearTimeout(id));
+          activeTimers = [];
+        }
+
+        function render() {
+          appRoot.innerHTML = (state.gameState === "TITLE_MENU" ? renderTitleScreen() : renderGameScreen()) + renderModals();
+          bindEvents();
+        }
+
+        function handleTubeTap(idx) {
+          if (state.gameState !== "PLAYING" || state.pourAnim || state.wonLocked) return;
+          const clicked = state.tubes[idx];
+          if (!clicked) return;
+
+          if (state.selectedIndex === null) {
+            if (!clicked.length || isTubeSolved(clicked)) {
+              soundEngine.playInvalid();
+              state.invalidShakeIndex = idx;
+              render();
+              activeTimers.push(setTimeout(() => { state.invalidShakeIndex = null; render(); }, 200));
+              return;
+            }
+            soundEngine.playSelect();
+            state.selectedIndex = idx;
+            render();
+            return;
+          }
+
+          if (state.selectedIndex === idx) {
+            soundEngine.playDeselect();
+            state.selectedIndex = null;
+            render();
+            return;
+          }
+
+          const res = applyPour(state.tubes, state.selectedIndex, idx);
+          if (!res) {
+            soundEngine.playInvalid();
+            state.invalidShakeIndex = idx;
+            state.selectedIndex = null;
+            render();
+            activeTimers.push(setTimeout(() => { state.invalidShakeIndex = null; render(); }, 200));
+            return;
+          }
+
+          const boardEl = document.getElementById("board-container");
+          const fromEl = document.querySelector(`[data-tube-idx="${state.selectedIndex}"]`);
+          const toEl = document.querySelector(`[data-tube-idx="${idx}"]`);
+          const snap = { tubes: state.tubes.map((t) => t.slice()), moves: state.moves };
+          const targetFillBefore = state.tubes[idx].length;
+          const wasSolvedBefore = isTubeSolved(state.tubes[idx]);
+          const isSolvedNow = isTubeSolved(res.nextTubes[idx]);
+
+          soundEngine.playPour(res.pouredCount);
+          state.history.push(snap);
+          state.moves += 1;
+
+          if (boardEl && fromEl && toEl) {
+            const b = boardEl.getBoundingClientRect();
+            const f = fromEl.getBoundingClientRect();
+            const t = toEl.getBoundingClientRect();
+            state.pourAnim = {
+              fromIndex: state.selectedIndex,
+              toIndex: idx,
+              color: res.color,
+              count: res.pouredCount,
+              fromRect: { x: f.left - b.left, y: f.top - b.top, width: f.width, height: f.height },
+              toRect: { x: t.left - b.left, y: t.top - b.top, width: t.width, height: t.height },
+              targetFillBefore
+            };
+          }
+          state.selectedIndex = null;
+          render();
+
+          activeTimers.push(setTimeout(() => {
+            state.tubes = res.nextTubes;
+            if (!wasSolvedBefore && isSolvedNow) soundEngine.playTubeComplete();
+            render();
+          }, 110));
+
+          activeTimers.push(setTimeout(() => {
+            state.pourAnim = null;
+            render();
+            if (isLevelWon(res.nextTubes) && !state.wonLocked) {
+              state.wonLocked = true;
+              soundEngine.playVictory();
+              activeTimers.push(setTimeout(() => {
+                state.lastMoves = state.moves;
+                if (!state.completedLevels.includes(state.currentLevel)) {
+                  state.completedLevels.push(state.currentLevel);
+                }
+                if (state.currentLevel >= state.highestUnlockedLevel) {
+                  state.highestUnlockedLevel = state.currentLevel + 1;
+                }
+                saveProgress();
+                if (state.currentLevel === TOTAL_CAMPAIGN_LEVELS) {
+                  state.gameState = "ALL_COMPLETE";
+                  showGameMonetizeBanner();
+                } else {
+                  state.gameState = "ROUND_SUMMARY";
+                }
+                render();
+              }, 320));
+            }
+          }, 330));
+        }
+
+        function handleUndo() {
+          if (state.gameState !== "PLAYING" || state.pourAnim || !state.history.length || state.wonLocked) return;
+          const last = state.history.pop();
+          soundEngine.playUndo();
+          state.tubes = last.tubes;
+          state.moves = last.moves;
+          state.selectedIndex = null;
+          render();
+        }
+
+        function handleAddGlass() {
+          if (state.gameState !== "PLAYING" || state.pourAnim || state.extraGlassesUsed >= MAX_EXTRA_GLASSES || state.wonLocked) return;
+          soundEngine.playAddGlass();
+          state.history.push({ tubes: state.tubes.map((t) => t.slice()), moves: state.moves });
+          state.tubes.push([]);
+          state.extraGlassesUsed += 1;
+          state.selectedIndex = null;
+          render();
+        }
+
+        function handleRestart() {
+          if (state.pourAnim) return;
+          clearTimers();
+          soundEngine.playDeselect();
+          startLevel(state.currentLevel);
+          render();
+        }
+
+        function bindEvents() {
+          const on = (id, fn) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener("click", fn);
+          };
+
+          on("btn-mute", () => { state.isMuted = !state.isMuted; soundEngine.setUserMuted(state.isMuted); saveProgress(); render(); });
+          on("btn-modal-mute", () => { state.isMuted = !state.isMuted; soundEngine.setUserMuted(state.isMuted); saveProgress(); render(); });
+          on("btn-symbols", () => { state.showSymbols = !state.showSymbols; saveProgress(); render(); });
+          on("btn-modal-symbols", () => { state.showSymbols = !state.showSymbols; saveProgress(); render(); });
+
+          on("btn-play", () => {
+            clearTimers();
+            startLevel(state.highestUnlockedLevel > 0 ? state.highestUnlockedLevel : 1);
+            state.openedFromTitle = false;
+            state.isLevelSelectOpen = false;
+            state.gameState = "PLAYING";
+            showGameMonetizeBanner();
+            render();
+          });
+
+          on("btn-levels", () => {
+            state.openedFromTitle = true;
+            state.isLevelSelectOpen = true;
+            state.gameState = "PAUSED";
+            render();
+          });
+
+          on("btn-pause", () => {
+            state.openedFromTitle = false;
+            state.isLevelSelectOpen = false;
+            state.gameState = "PAUSED";
+            render();
+          });
+
+          on("btn-modal-close", () => {
+            state.isLevelSelectOpen = false;
+            if (state.openedFromTitle) {
+              state.openedFromTitle = false;
+              state.gameState = "TITLE_MENU";
+            } else {
+              state.gameState = "PLAYING";
+              showGameMonetizeBanner();
+            }
+            render();
+          });
+
+          on("btn-resume", () => {
+            state.isLevelSelectOpen = false;
+            state.gameState = "PLAYING";
+            showGameMonetizeBanner();
+            render();
+          });
+
+          on("btn-modal-restart", () => {
+            clearTimers();
+            state.isLevelSelectOpen = false;
+            startLevel(state.currentLevel);
+            state.gameState = "PLAYING";
+            render();
+          });
+
+          on("btn-modal-levels", () => { state.isLevelSelectOpen = true; render(); });
+          on("btn-modal-home", () => { clearTimers(); state.isLevelSelectOpen = false; state.gameState = "TITLE_MENU"; render(); });
+
+          on("btn-undo", handleUndo);
+          on("btn-add-glass", handleAddGlass);
+          on("btn-restart", handleRestart);
+
+          on("btn-next-level", () => {
+            clearTimers();
+            startLevel(state.currentLevel + 1);
+            state.gameState = "PLAYING";
+            showGameMonetizeBanner();
+            render();
+          });
+
+          on("btn-replay-level", () => {
+            clearTimers();
+            startLevel(state.currentLevel);
+            state.gameState = "PLAYING";
+            render();
+          });
+
+          on("btn-endless", () => {
+            clearTimers();
+            startLevel(TOTAL_CAMPAIGN_LEVELS + 1);
+            state.gameState = "PLAYING";
+            showGameMonetizeBanner();
+            render();
+          });
+
+          on("btn-replay-campaign", () => {
+            clearTimers();
+            startLevel(1);
+            state.gameState = "PLAYING";
+            showGameMonetizeBanner();
+            render();
+          });
+
+          document.querySelectorAll("[data-tube-idx]").forEach((btn) => {
+            btn.addEventListener("click", () => handleTubeTap(Number(btn.getAttribute("data-tube-idx"))));
+          });
+
+          document.querySelectorAll("[data-select-level]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const lv = Number(btn.getAttribute("data-select-level"));
+              clearTimers();
+              state.openedFromTitle = false;
+              state.isLevelSelectOpen = false;
+              startLevel(lv);
+              state.gameState = "PLAYING";
+              showGameMonetizeBanner();
+              render();
+            });
+          });
+        }
+
+        /* Keyboard Controls */
+        window.addEventListener("keydown", (e) => {
+          if (state.gameState === "TITLE_MENU" && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            const playBtn = document.getElementById("btn-play");
+            if (playBtn) playBtn.click();
+            return;
+          }
+          if (e.key === "Escape") {
+            if (state.gameState === "PLAYING") {
+              e.preventDefault();
+              state.openedFromTitle = false;
+              state.isLevelSelectOpen = false;
+              state.gameState = "PAUSED";
+              render();
+            } else if (state.gameState === "PAUSED") {
+              e.preventDefault();
+              const closeBtn = document.getElementById("btn-modal-close");
+              if (closeBtn) closeBtn.click();
+            }
+            return;
+          }
+          if (state.gameState !== "PLAYING") return;
+          if (e.key === "z" || e.key === "Z") { e.preventDefault(); handleUndo(); }
+          else if (e.key === "g" || e.key === "G") { e.preventDefault(); handleAddGlass(); }
+          else if (e.key === "r" || e.key === "R") { e.preventDefault(); handleRestart(); }
+        });
+
+        /* GameMonetize SDK Lifecycle Events */
+        window.addEventListener("gm:pause", () => {
+          soundEngine.setSdkPaused(true);
+          if (state.gameState === "PLAYING") {
+            state.gameState = "PAUSED";
+            render();
+          }
+        });
+        window.addEventListener("gm:resume", () => {
+          soundEngine.setSdkPaused(false);
+        });
+
+        render();
+      })();
+    </script>
+  </body>
+</html>
